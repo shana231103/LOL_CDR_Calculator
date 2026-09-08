@@ -1,0 +1,52 @@
+[
+  {
+    "id": 8106,
+    "key": "UltimateHunter",
+    "name": "Ultimate Hunter",
+    "icon_url": "perk-images/Styles/Domination/UltimateHunter/UltimateHunter.png",
+    "haste_type": "ULTIMATE_HASTE",
+    "base_haste": 6.0,
+    "haste_per_stack": 5.0,
+    "max_stacks": 5
+  },
+  {
+    "id": 9105,
+    "key": "LegendHaste",
+    "name": "Legend: Haste",
+    "icon_url": "perk-images/Styles/Precision/LegendHaste/LegendHaste.png",
+    "haste_type": "ABILITY_HASTE",
+    "base_haste": 0.0,
+    "haste_per_stack": 1.5,
+    "max_stacks": 10
+  },
+  {
+    "id": 8210,
+    "key": "Transcendence",
+    "name": "Transcendence",
+    "icon_url": "perk-images/Styles/Sorcery/Transcendence/Transcendence.png",
+    "haste_type": "ABILITY_HASTE",
+    "base_haste": 10.0,
+    "haste_per_stack": 0.0,
+    "max_stacks": 0
+  },
+  {
+    "id": 8347,
+    "key": "CosmicInsight",
+    "name": "Cosmic Insight",
+    "icon_url": "perk-images/Styles/Inspiration/CosmicInsight/CosmicInsight.png",
+    "haste_type": "SUMMONER_HASTE",
+    "base_haste": 18.0,
+    "haste_per_stack": 0.0,
+    "max_stacks": 0
+  },
+  {
+    "id": 5007,
+    "key": "StatHasteShard",
+    "name": "Ability Haste Shard",
+    "icon_url": "perk-images/StatMods/StatModsAbilityHasteIcon.png",
+    "haste_type": "ABILITY_HASTE",
+    "base_haste": 8.0,
+    "haste_per_stack": 0.0,
+    "max_stacks": 0
+  }
+]
