@@ -1,5 +1,0 @@
-{
-  "project_id": "cdr_calculate_lol",
-  "memory_root": ".agents/memory",
-  "vector_provider": "none"
-}
