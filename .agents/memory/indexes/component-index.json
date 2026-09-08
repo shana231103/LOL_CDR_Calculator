@@ -1,0 +1,73 @@
+{
+  "layers": {
+    "domain": {
+      "entities": ["Ability", "Champion", "Item", "Rune", "RuneSelection", "SummonerSpell", "Build"],
+      "value_objects": ["Cooldown", "AbilityHaste", "SkillRank", "PatchVersion"],
+      "services": ["CooldownCalculator"],
+      "repository_ports": ["IChampionRepository", "IItemRepository", "IRuneRepository", "ISpellRepository", "IPatchRepository"]
+    },
+    "application": {
+      "use_cases": [
+        "CalculateCooldownUseCase",
+        "SyncPatchDataUseCase",
+        "GetChampionsUseCase",
+        "GetChampionByIdUseCase",
+        "GetItemsUseCase",
+        "GetRunesUseCase",
+        "GetSpellsUseCase"
+      ],
+      "dtos": [
+        "CalculateCooldownCommand",
+        "CalculationResultDTO",
+        "AbilityCooldownResultDTO",
+        "SummonerCooldownResultDTO",
+        "ChampionDTO",
+        "AbilityDTO",
+        "ItemDTO",
+        "RuneDTO",
+        "SpellDTO"
+      ],
+      "gateway_ports": ["IRiotDataDragonGateway"]
+    },
+    "infrastructure": {
+      "database": {
+        "engine": "SQLAlchemy 2.0 Async / asyncpg / aiosqlite",
+        "models": ["ChampionORM", "AbilityORM", "ItemORM", "RuneORM", "SpellORM", "PatchORM"]
+      },
+      "repositories": [
+        "SqlChampionRepository",
+        "SqlItemRepository",
+        "SqlRuneRepository",
+        "SqlSpellRepository",
+        "SqlPatchRepository"
+      ],
+      "gateways": ["RiotDataDragonClient"]
+    },
+    "presentation": {
+      "framework": "FastAPI",
+      "router_prefix": "/api/v1",
+      "routes": [
+        "POST /api/v1/calculate",
+        "GET /api/v1/champions",
+        "GET /api/v1/champions/{id}",
+        "GET /api/v1/items",
+        "GET /api/v1/runes",
+        "GET /api/v1/summoner-spells",
+        "POST /api/v1/sync",
+        "GET /api/v1/health"
+      ]
+    },
+    "frontend": {
+      "framework": "Vue 3 + Vite + TailwindCSS",
+      "state_management": "Pinia (calculatorStore.js)",
+      "components": [
+        "ChampionSelector.vue",
+        "AbilityPanel.vue",
+        "ItemInventory.vue",
+        "RuneSection.vue",
+        "SummonerSpellSelector.vue",
+        "CooldownSummary.vue"
+      ]
+    }
+  }
+}
