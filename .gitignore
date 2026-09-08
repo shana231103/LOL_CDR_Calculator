@@ -121,3 +121,5 @@ logs/
 *.temp
 *.swp
 *~
+scratch/
+.scratch/
