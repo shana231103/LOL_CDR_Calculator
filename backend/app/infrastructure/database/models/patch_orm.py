@@ -12,6 +12,6 @@ class PatchORM(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
     version: Mapped[str] = mapped_column(String(30))
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )

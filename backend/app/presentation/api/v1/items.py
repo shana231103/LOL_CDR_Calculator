@@ -21,6 +21,9 @@ async def list_items(
             description=item.description,
             image_url=item.image_url,
             ability_haste=item.ability_haste,
+            ultimate_haste=item.ultimate_haste,
+            basic_haste=item.basic_haste,
+            summoner_haste=item.summoner_haste,
             gold_total=item.gold_total,
         )
         for item in items
