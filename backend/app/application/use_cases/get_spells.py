@@ -8,8 +8,8 @@ class GetSpellsUseCase:
     def __init__(self, spell_repo: ISpellRepository) -> None:
         self._spell_repo = spell_repo
 
-    async def execute(self) -> list[SpellDTO]:
-        spells = await self._spell_repo.get_all()
+    async def execute(self, locale: str = "vi_VN") -> list[SpellDTO]:
+        spells = await self._spell_repo.get_all(locale=locale)
         return [
             SpellDTO(
                 id=s.id,

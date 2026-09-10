@@ -35,9 +35,9 @@ function closeModal() {
   <div class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-        Summoner Spells
+        {{ store.t('spellTitle') }}
       </span>
-      <span class="text-2xs text-text-secondary">2 Slots</span>
+      <span class="text-2xs text-text-secondary">{{ store.t('twoSlots') }}</span>
     </div>
 
     <!-- 2 Spell Slots -->
@@ -64,7 +64,7 @@ function closeModal() {
 
           <div class="flex flex-col min-w-0">
             <span class="text-sm font-semibold text-white truncate">{{ spell.name }}</span>
-            <span class="text-2xs text-text-secondary font-mono">{{ spell.cooldown }}s base</span>
+            <span class="text-2xs text-text-secondary font-mono">{{ spell.cooldown }}s {{ store.t('base') }}</span>
           </div>
 
           <button
@@ -78,7 +78,7 @@ function closeModal() {
         <template v-else>
           <div class="w-full flex items-center justify-center gap-2 text-border-active group-hover:text-text-secondary">
             <Plus class="w-4 h-4" />
-            <span class="text-xs uppercase font-mono tracking-wider">Spell {{ idx === 0 ? 'D' : 'F' }}</span>
+            <span class="text-xs uppercase font-mono tracking-wider">{{ store.t('spellTitle') }} {{ idx === 0 ? 'D' : 'F' }}</span>
           </div>
         </template>
       </div>
@@ -94,7 +94,7 @@ function closeModal() {
       >
         <div class="flex items-center justify-between p-4 border-b border-border-default">
           <h2 class="text-base font-bold text-white tracking-wide">
-            Select Summoner Spell (Slot {{ activeSlot === 0 ? 'D' : 'F' }})
+            {{ store.t('selectSummonerSpell') }} (Slot {{ activeSlot === 0 ? 'D' : 'F' }})
           </h2>
           <button
             @click="closeModal"

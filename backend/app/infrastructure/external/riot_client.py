@@ -15,15 +15,27 @@ from app.application.ports.riot_gateway import IRiotDataDragonGateway
 
 TRANSFORMED_TEAR_ITEM_IDS: set[int] = {3042, 3040, 3048}
 
-BASE_AH_REGEX = re.compile(r"(?<!Ultimate\s)(?<!Basic\s)(\d+)\s*(?:<[^>]+>)*\s*Ability Haste", re.IGNORECASE)
-ULT_HASTE_REGEX = re.compile(r"(\d+)\s*(?:<[^>]+>)*\s*Ultimate\s*(?:Ability)?\s*Haste", re.IGNORECASE)
-BASIC_HASTE_REGEX = re.compile(r"(\d+)\s*(?:<[^>]+>)*\s*Basic\s*Ability\s*Haste", re.IGNORECASE)
-SUMM_HASTE_REGEX = re.compile(r"(\d+)\s*(?:<[^>]+>)*\s*Summoner\s*Spell\s*Haste", re.IGNORECASE)
+BASE_AH_REGEX = re.compile(
+    r"(?<!Ultimate\s)(?<!Basic\s)(?<!Chiêu Cuối\s)(?<!Cơ Bản\s)(\d+)\s*(?:<[^>]+>)*\s*(?:Ability Haste|Điểm Hồi Kỹ Năng)",
+    re.IGNORECASE,
+)
+ULT_HASTE_REGEX = re.compile(
+    r"(\d+)\s*(?:<[^>]+>)*\s*(?:Ultimate\s*(?:Ability)?\s*Haste|Điểm Hồi Chiêu Cuối|Điểm Hồi Kỹ Năng cho Chiêu Cuối)",
+    re.IGNORECASE,
+)
+BASIC_HASTE_REGEX = re.compile(
+    r"(\d+)\s*(?:<[^>]+>)*\s*(?:Basic\s*Ability\s*Haste|Điểm Hồi Kỹ Năng Cơ Bản)",
+    re.IGNORECASE,
+)
+SUMM_HASTE_REGEX = re.compile(
+    r"(\d+)\s*(?:<[^>]+>)*\s*(?:Summoner\s*Spell\s*Haste|Điểm Hồi Phép Bổ Trợ)",
+    re.IGNORECASE,
+)
 STATS_BLOCK_REGEX = re.compile(r"<stats>(.*?)</stats>", re.IGNORECASE | re.DOTALL)
 
 
 class RiotDataDragonClient(IRiotDataDragonGateway):
-    """HTTPX adapter for Riot Data Dragon CDN."""
+    """HTTPX adapter for Riot Data Dragon CDN supporting en_US and vi_VN."""
 
     def __init__(self, cdn_base: str = "https://ddragon.leagueoflegends.com") -> None:
         self._cdn_base = cdn_base.rstrip("/")
@@ -36,7 +48,8 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
             if m := BASE_AH_REGEX.search(stats_m.group(1)):
                 ah = float(m.group(1))
         elif m := BASE_AH_REGEX.search(desc):
-            if "gain" not in desc[:m.start()].lower()[-10:]:
+            prefix = desc[:m.start()].lower()[-15:]
+            if "gain" not in prefix and "nhận" not in prefix:
                 ah = float(m.group(1))
         if m_u := ULT_HASTE_REGEX.search(desc):
             ult_h = float(m_u.group(1))
@@ -60,8 +73,8 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
             versions = resp.json()
             return str(versions[0])
 
-    async def fetch_champions(self, version: str) -> list[Champion]:
-        url = f"{self._cdn_base}/cdn/{version}/data/en_US/championFull.json"
+    async def fetch_champions(self, version: str, locale: str = "vi_VN") -> list[Champion]:
+        url = f"{self._cdn_base}/cdn/{version}/data/{locale}/championFull.json"
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.get(url)
             resp.raise_for_status()
@@ -77,6 +90,7 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
                 name=c_data.get("name", c_id),
                 title=c_data.get("title", ""),
                 image_url=f"{self._cdn_base}/cdn/{version}/img/champion/{img_file}",
+                locale=locale,
             )
             for s_idx, sp in enumerate(c_data.get("spells", [])):
                 if s_idx >= 4:
@@ -97,8 +111,8 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
             champions.append(champ)
         return champions
 
-    async def fetch_items(self, version: str) -> list[Item]:
-        url = f"{self._cdn_base}/cdn/{version}/data/en_US/item.json"
+    async def fetch_items(self, version: str, locale: str = "vi_VN") -> list[Item]:
+        url = f"{self._cdn_base}/cdn/{version}/data/{locale}/item.json"
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.get(url)
             resp.raise_for_status()
@@ -115,8 +129,6 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
             if not i_id.isdigit():
                 continue
             item_id = int(i_id)
-
-            # Gating predicates for Summoner's Rift map 11
             if not i_data.get("maps", {}).get("11", False):
                 continue
             gold_data = i_data.get("gold", {})
@@ -131,7 +143,6 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
             name = i_data.get("name", "")
             desc = i_data.get("description", "")
             img_file = i_data.get("image", {}).get("full", "")
-
             ah, ult_h, basic_h, summ_h = self._parse_item_haste(desc, item_id, item_overlay)
 
             items.append(
@@ -145,11 +156,12 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
                     basic_haste=basic_h,
                     summoner_haste=summ_h,
                     gold_total=gold,
+                    locale=locale,
                 )
             )
         return items
 
-    async def fetch_runes(self, version: str) -> list[Rune]:
+    async def fetch_runes(self, version: str, locale: str = "vi_VN") -> list[Rune]:
         overlay_path = Path(__file__).parent / "rune_modifiers.json"
         with open(overlay_path, encoding="utf-8") as f:
             raw_runes = json.load(f)
@@ -157,22 +169,24 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
         runes: list[Rune] = []
         for r in raw_runes:
             icon_sub = r["icon_url"].lstrip("/")
+            name = r.get("name_vi", r["name"]) if locale == "vi_VN" else r.get("name_en", r["name"])
             runes.append(
                 Rune(
                     id=r["id"],
                     key=r["key"],
-                    name=r["name"],
+                    name=name,
                     icon_url=f"{self._cdn_base}/cdn/img/{icon_sub}",
                     haste_type=HasteType(r["haste_type"]),
                     base_haste=float(r["base_haste"]),
                     haste_per_stack=float(r["haste_per_stack"]),
                     max_stacks=int(r["max_stacks"]),
+                    locale=locale,
                 )
             )
         return runes
 
-    async def fetch_spells(self, version: str) -> list[SummonerSpell]:
-        url = f"{self._cdn_base}/cdn/{version}/data/en_US/summoner.json"
+    async def fetch_spells(self, version: str, locale: str = "vi_VN") -> list[SummonerSpell]:
+        url = f"{self._cdn_base}/cdn/{version}/data/{locale}/summoner.json"
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.get(url)
             resp.raise_for_status()
@@ -191,6 +205,7 @@ class RiotDataDragonClient(IRiotDataDragonGateway):
                     description=s_data.get("description", ""),
                     cooldown=cd_val,
                     image_url=f"{self._cdn_base}/cdn/{version}/img/spell/{img_file}",
+                    locale=locale,
                 )
             )
         return spells

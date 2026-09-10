@@ -8,6 +8,7 @@ import ItemInventory from './components/ItemInventory.vue'
 import RuneSection from './components/RuneSection.vue'
 import SummonerSpellSelector from './components/SummonerSpellSelector.vue'
 import CooldownSummary from './components/CooldownSummary.vue'
+import LanguageSwitcher from './components/LanguageSwitcher.vue'
 import { RotateCcw, RefreshCw, Activity } from 'lucide-vue-next'
 import api from './services/api'
 
@@ -23,11 +24,11 @@ async function handleManualSync() {
   isSyncing.value = true
   syncMessage.value = ''
   try {
-    const res = await api.syncPatch(true)
-    syncMessage.value = `Synced ${res.patch || 'patch'}`
+    const res = await api.syncPatch(true, 'vi_VN,en_US')
+    syncMessage.value = `${store.t('syncedPatch')} ${res.patch || ''}`
     await store.init()
   } catch (err) {
-    syncMessage.value = 'Sync failed'
+    syncMessage.value = store.t('syncFailed')
   } finally {
     isSyncing.value = false
     setTimeout(() => {
@@ -49,19 +50,19 @@ async function handleManualSync() {
           </div>
           <div class="flex flex-col">
             <span class="text-sm font-bold tracking-wider uppercase text-white font-mono">
-              LoL CDR Engine
+              {{ store.t('brandName') }}
             </span>
             <span class="text-3xs text-text-secondary">
-              Tactical Cooldown Calculator Core
+              {{ store.t('brandSubtitle') }}
             </span>
           </div>
         </div>
 
-        <!-- Controls & Patch Tag -->
+        <!-- Controls & Patch Tag & Language Switcher -->
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-inset border border-border-default text-xs font-mono">
             <span class="w-2 h-2 rounded-full bg-accent-success animate-pulse"></span>
-            <span class="text-text-secondary">Patch:</span>
+            <span class="text-text-secondary">{{ store.t('patch') }}:</span>
             <span class="text-white font-bold">{{ store.activePatch }}</span>
           </div>
 
@@ -69,10 +70,10 @@ async function handleManualSync() {
             @click="handleManualSync"
             :disabled="isSyncing"
             class="px-2.5 py-1 rounded bg-[#21242C] border border-border-default hover:border-border-active text-xs font-medium text-text-primary hover:text-white flex items-center gap-1.5 transition-colors disabled:opacity-50"
-            title="Force re-sync data from Riot Data Dragon"
+            :title="store.t('syncCdn')"
           >
             <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': isSyncing }" />
-            <span>{{ isSyncing ? 'Syncing...' : 'Sync CDN' }}</span>
+            <span>{{ isSyncing ? store.t('syncing') : store.t('syncCdn') }}</span>
           </button>
 
           <span v-if="syncMessage" class="text-xs text-accent-ah font-mono">
@@ -82,11 +83,14 @@ async function handleManualSync() {
           <button
             @click="store.resetBuild"
             class="px-2.5 py-1 rounded bg-[#21242C] border border-border-default hover:border-border-active text-xs font-medium text-text-primary hover:text-white flex items-center gap-1.5 transition-colors"
-            title="Reset active build ranks, items and runes"
+            :title="store.t('resetBuild')"
           >
             <RotateCcw class="w-3 h-3" />
-            <span>Reset Build</span>
+            <span>{{ store.t('resetBuild') }}</span>
           </button>
+
+          <!-- Top-Right Language Switcher -->
+          <LanguageSwitcher />
         </div>
       </div>
     </header>
@@ -95,7 +99,7 @@ async function handleManualSync() {
     <main class="flex-1 max-w-7xl mx-auto w-full p-4 lg:p-6">
       <div v-if="store.isLoading" class="h-96 flex flex-col items-center justify-center gap-3">
         <div class="w-8 h-8 border-2 border-accent-ah border-t-transparent rounded-full animate-spin"></div>
-        <span class="text-xs font-mono text-text-secondary tracking-wider uppercase">Loading Tactical Data...</span>
+        <span class="text-xs font-mono text-text-secondary tracking-wider uppercase">{{ store.t('loadingData') }}</span>
       </div>
 
       <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -121,7 +125,7 @@ async function handleManualSync() {
 
     <!-- Footer Status -->
     <footer class="border-t border-border-subtle bg-[#111215] px-6 py-2.5 text-center text-3xs text-text-secondary font-mono">
-      League of Legends CDR Engine • Authoritative Sub-50ms Calculation • DDD & Clean Architecture
+      {{ store.t('footerText') }}
     </footer>
   </div>
 </template>

@@ -13,6 +13,7 @@ class ChampionORM(Base):
     __tablename__ = "champions"
 
     id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    locale: Mapped[str] = mapped_column(String(10), primary_key=True, default="vi_VN")
     key: Mapped[str] = mapped_column(String(20), index=True)
     name: Mapped[str] = mapped_column(String(100), index=True)
     title: Mapped[str] = mapped_column(String(150))

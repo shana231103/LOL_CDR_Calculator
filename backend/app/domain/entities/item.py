@@ -15,6 +15,7 @@ class Item:
     basic_haste: float = 0.0
     summoner_haste: float = 0.0
     gold_total: int = 0
+    locale: str = "vi_VN"
 
     def get_haste(self) -> AbilityHaste:
         return AbilityHaste(max(0.0, float(self.ability_haste)))

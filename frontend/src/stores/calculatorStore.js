@@ -2,9 +2,11 @@
 
 import { defineStore } from 'pinia'
 import api from '../services/api'
+import { messages } from '../locales/messages'
 
 export const useCalculatorStore = defineStore('calculator', {
   state: () => ({
+    currentLocale: localStorage.getItem('lol_cdr_locale') || 'vi_VN',
     champions: [],
     selectedChampion: null,
     skillRanks: { Q: 1, W: 1, E: 1, R: 1 },
@@ -41,15 +43,60 @@ export const useCalculatorStore = defineStore('calculator', {
   },
 
   actions: {
+    t(key) {
+      return messages[this.currentLocale]?.[key] || messages['vi_VN']?.[key] || key
+    },
+
+    async setLocale(newLocale) {
+      if (this.currentLocale === newLocale) return
+      this.currentLocale = newLocale
+      localStorage.setItem('lol_cdr_locale', newLocale)
+
+      this.isLoading = true
+      try {
+        const prevChampId = this.selectedChampion?.id
+        const prevItemIds = this.items.map((it) => (it ? it.id : null))
+        const prevSpellIds = this.selectedSpells.map((s) => (s ? s.id : null))
+
+        const [champions, items, runes, spells] = await Promise.all([
+          api.getChampions(newLocale),
+          api.getItems('', newLocale),
+          api.getRunes(newLocale),
+          api.getSpells(newLocale),
+        ])
+
+        this.champions = champions
+        this.availableItems = items
+        this.runes = runes
+        this.spells = spells
+
+        if (prevChampId) {
+          const found = champions.find((c) => c.id === prevChampId)
+          if (found) {
+            this.selectedChampion = found
+          }
+        }
+
+        this.items = prevItemIds.map((id) => (id != null ? items.find((i) => String(i.id) === String(id)) || null : null))
+        this.selectedSpells = prevSpellIds.map((id) => (id != null ? spells.find((s) => String(s.id) === String(id)) || null : null))
+
+        this.triggerCalculate()
+      } catch (err) {
+        this.error = err.response?.data?.detail || err.message || 'Failed to switch language'
+      } finally {
+        this.isLoading = false
+      }
+    },
+
     async init() {
       this.isLoading = true
       this.error = null
       try {
         const [champions, items, runes, spells] = await Promise.all([
-          api.getChampions(),
-          api.getItems(),
-          api.getRunes(),
-          api.getSpells(),
+          api.getChampions(this.currentLocale),
+          api.getItems('', this.currentLocale),
+          api.getRunes(this.currentLocale),
+          api.getSpells(this.currentLocale),
         ])
 
         this.champions = champions
@@ -81,7 +128,6 @@ export const useCalculatorStore = defineStore('calculator', {
       this.selectedChampion = champ
       this.skillRanks = { Q: 1, W: 1, E: 1, R: 1 }
 
-      // Set max rank values properly if abilities provide maxrank
       if (champ.abilities) {
         champ.abilities.forEach((ab) => {
           this.skillRanks[ab.slot] = 1
@@ -115,7 +161,6 @@ export const useCalculatorStore = defineStore('calculator', {
       if (this.selectedRunes[rune.id] !== undefined) {
         delete this.selectedRunes[rune.id]
       } else {
-        // Default to max stacks or 0
         this.selectedRunes[rune.id] = rune.max_stacks > 0 ? rune.max_stacks : 0
       }
       this.triggerCalculate()
@@ -174,6 +219,7 @@ export const useCalculatorStore = defineStore('calculator', {
           items: itemIds,
           runes: runesPayload,
           summoner_spells: spellIds,
+          locale: this.currentLocale,
         }
 
         const res = await api.calculateCooldowns(payload)

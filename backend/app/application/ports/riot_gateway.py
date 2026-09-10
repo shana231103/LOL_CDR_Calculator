@@ -16,21 +16,21 @@ class IRiotDataDragonGateway(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def fetch_champions(self, version: str) -> list[Champion]:
-        """Fetches full champion data with abilities for the given patch version."""
+    async def fetch_champions(self, version: str, locale: str = "vi_VN") -> list[Champion]:
+        """Fetches full champion data with abilities for the given patch version and locale."""
         raise NotImplementedError
 
     @abstractmethod
-    async def fetch_items(self, version: str) -> list[Item]:
-        """Fetches item data with ability haste values for the given patch version."""
+    async def fetch_items(self, version: str, locale: str = "vi_VN") -> list[Item]:
+        """Fetches item data with ability haste values for the given patch version and locale."""
         raise NotImplementedError
 
     @abstractmethod
-    async def fetch_runes(self, version: str) -> list[Rune]:
-        """Fetches haste-related runes with metadata for the given patch version."""
+    async def fetch_runes(self, version: str, locale: str = "vi_VN") -> list[Rune]:
+        """Fetches haste-related runes with metadata for the given patch version and locale."""
         raise NotImplementedError
 
     @abstractmethod
-    async def fetch_spells(self, version: str) -> list[SummonerSpell]:
-        """Fetches summoner spells for the given patch version."""
+    async def fetch_spells(self, version: str, locale: str = "vi_VN") -> list[SummonerSpell]:
+        """Fetches summoner spells for the given patch version and locale."""
         raise NotImplementedError

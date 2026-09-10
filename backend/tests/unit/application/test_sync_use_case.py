@@ -29,8 +29,8 @@ async def test_sync_patch_data_prunes_items_before_upsert():
     gateway.fetch_spells.return_value = []
 
     call_order = []
-    item_repo.delete_all.side_effect = lambda: call_order.append("delete_all")
-    item_repo.upsert_many.side_effect = lambda items: call_order.append("upsert_many")
+    item_repo.delete_all.side_effect = lambda *a, **kw: call_order.append("delete_all")
+    item_repo.upsert_many.side_effect = lambda items, *a, **kw: call_order.append("upsert_many")
 
     use_case = SyncPatchDataUseCase(
         gateway=gateway,
@@ -48,6 +48,6 @@ async def test_sync_patch_data_prunes_items_before_upsert():
     assert result["items_count"] == 1
 
     # Verify delete_all was called strictly before upsert_many
-    item_repo.delete_all.assert_awaited_once()
-    item_repo.upsert_many.assert_awaited_once_with([test_item])
+    item_repo.delete_all.assert_awaited_once_with(locale="vi_VN")
+    item_repo.upsert_many.assert_awaited_once_with([test_item], locale="vi_VN")
     assert call_order == ["delete_all", "upsert_many"]

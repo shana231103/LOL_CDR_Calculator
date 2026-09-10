@@ -12,6 +12,7 @@ class SummonerSpell:
     description: str
     cooldown: float
     image_url: str
+    locale: str = "vi_VN"
 
     def get_base_cooldown(self) -> Cooldown:
         return Cooldown(max(0.0, float(self.cooldown)))

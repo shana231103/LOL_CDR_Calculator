@@ -9,6 +9,7 @@ class RuneORM(Base):
     __tablename__ = "runes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    locale: Mapped[str] = mapped_column(String(10), primary_key=True, default="vi_VN")
     key: Mapped[str] = mapped_column(String(50), index=True)
     name: Mapped[str] = mapped_column(String(100))
     icon_url: Mapped[str] = mapped_column(String(255), default="")

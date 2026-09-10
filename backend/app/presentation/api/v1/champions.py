@@ -1,6 +1,6 @@
 # File: backend/app/presentation/api/v1/champions.py
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.infrastructure.di.container import (
     get_champions_use_case,
     get_champion_by_id_use_case,
@@ -19,9 +19,10 @@ router = APIRouter(prefix="/champions", tags=["Champions"])
 
 @router.get("", response_model=list[ChampionResponseSchema])
 async def list_champions(
+    locale: str = Query("vi_VN", pattern="^(vi_VN|en_US)$"),
     use_case: GetChampionsUseCase = Depends(get_champions_use_case),
 ) -> list[ChampionResponseSchema]:
-    champions = await use_case.execute()
+    champions = await use_case.execute(locale=locale)
     return [
         ChampionResponseSchema(
             id=c.id,
@@ -49,9 +50,10 @@ async def list_champions(
 @router.get("/{champion_id}", response_model=ChampionResponseSchema)
 async def get_champion(
     champion_id: str,
+    locale: str = Query("vi_VN", pattern="^(vi_VN|en_US)$"),
     use_case: GetChampionByIdUseCase = Depends(get_champion_by_id_use_case),
 ) -> ChampionResponseSchema:
-    champ = await use_case.execute(champion_id)
+    champ = await use_case.execute(champion_id, locale=locale)
     if champ is None:
         raise HTTPException(
             status_code=404,

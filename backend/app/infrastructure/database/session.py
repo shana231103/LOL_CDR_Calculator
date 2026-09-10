@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncGenerator
 from functools import lru_cache
+from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
@@ -51,7 +52,16 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Initializes schema tables if not already present."""
+    """Initializes schema tables and upgrades legacy schemas if needed."""
     engine = get_async_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        def check_and_create(sync_conn):
+            inspector = inspect(sync_conn)
+            tables = inspector.get_table_names()
+            if "champions" in tables:
+                columns = [c["name"] for c in inspector.get_columns("champions")]
+                if "locale" not in columns:
+                    Base.metadata.drop_all(sync_conn)
+            Base.metadata.create_all(sync_conn)
+
+        await conn.run_sync(check_and_create)

@@ -16,6 +16,7 @@ class CalculateCooldownCommand:
     items: list[int] = field(default_factory=list)
     runes: list[RuneSelectionInputDTO] = field(default_factory=list)
     summoner_spells: list[str] = field(default_factory=list)
+    locale: str = "vi_VN"
 
 
 @dataclass(frozen=True)

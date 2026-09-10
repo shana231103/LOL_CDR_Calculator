@@ -1,6 +1,6 @@
 # File: backend/app/presentation/api/v1/spells.py
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from app.infrastructure.di.container import get_spells_use_case
 from app.application.use_cases.get_spells import GetSpellsUseCase
 from app.presentation.schemas.spell_schema import SpellResponseSchema
@@ -10,9 +10,10 @@ router = APIRouter(prefix="/summoner-spells", tags=["Summoner Spells"])
 
 @router.get("", response_model=list[SpellResponseSchema])
 async def list_spells(
+    locale: str = Query("vi_VN", pattern="^(vi_VN|en_US)$"),
     use_case: GetSpellsUseCase = Depends(get_spells_use_case),
 ) -> list[SpellResponseSchema]:
-    spells = await use_case.execute()
+    spells = await use_case.execute(locale=locale)
     return [
         SpellResponseSchema(
             id=s.id,

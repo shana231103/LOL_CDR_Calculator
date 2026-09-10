@@ -42,9 +42,9 @@ function getBaseCooldown(ability, rank) {
   <div class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-        Abilities & Ranks
+        {{ store.t('abilityTitle') }}
       </span>
-      <span class="text-2xs text-text-secondary">Q / W / E / R Stepper</span>
+      <span class="text-2xs text-text-secondary">{{ store.t('qwerStepper') }}</span>
     </div>
 
     <div v-if="abilities.length > 0" class="flex flex-col gap-2.5">
@@ -73,7 +73,7 @@ function getBaseCooldown(ability, rank) {
               {{ ab.name }}
             </span>
             <span class="text-2xs text-text-secondary font-mono">
-              Base: {{ getBaseCooldown(ab, store.skillRanks[ab.slot] || 1) }}
+              {{ store.t('base') }}: {{ getBaseCooldown(ab, store.skillRanks[ab.slot] || 1) }}
             </span>
           </div>
         </div>
@@ -104,7 +104,7 @@ function getBaseCooldown(ability, rank) {
     </div>
 
     <div v-else class="py-8 text-center text-text-secondary text-xs">
-      Select a champion to configure skill ranks
+      {{ store.t('selectChampionAbilities') }}
     </div>
   </div>
 </template>

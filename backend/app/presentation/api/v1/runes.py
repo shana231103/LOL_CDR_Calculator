@@ -1,6 +1,6 @@
 # File: backend/app/presentation/api/v1/runes.py
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from app.infrastructure.di.container import get_runes_use_case
 from app.application.use_cases.get_runes import GetRunesUseCase
 from app.presentation.schemas.rune_schema import RuneResponseSchema
@@ -10,9 +10,10 @@ router = APIRouter(prefix="/runes", tags=["Runes"])
 
 @router.get("", response_model=list[RuneResponseSchema])
 async def list_runes(
+    locale: str = Query("vi_VN", pattern="^(vi_VN|en_US)$"),
     use_case: GetRunesUseCase = Depends(get_runes_use_case),
 ) -> list[RuneResponseSchema]:
-    runes = await use_case.execute()
+    runes = await use_case.execute(locale=locale)
     return [
         RuneResponseSchema(
             id=r.id,

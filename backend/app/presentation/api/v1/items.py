@@ -11,9 +11,10 @@ router = APIRouter(prefix="/items", tags=["Items"])
 @router.get("", response_model=list[ItemResponseSchema])
 async def list_items(
     search: str | None = Query(default=None, description="Search items by name"),
+    locale: str = Query("vi_VN", pattern="^(vi_VN|en_US)$"),
     use_case: GetItemsUseCase = Depends(get_items_use_case),
 ) -> list[ItemResponseSchema]:
-    items = await use_case.execute(search)
+    items = await use_case.execute(search=search, locale=locale)
     return [
         ItemResponseSchema(
             id=item.id,

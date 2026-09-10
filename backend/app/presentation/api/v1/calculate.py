@@ -31,6 +31,7 @@ async def calculate_cooldowns(
             for r in request.runes
         ],
         summoner_spells=request.summoner_spells,
+        locale=request.locale,
     )
 
     result_dto = await use_case.execute(command)

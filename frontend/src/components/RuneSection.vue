@@ -31,10 +31,10 @@ function changeStacks(rune, delta, event) {
   <div class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-        Haste Runes & Shards
+        {{ store.t('runeTitle') }}
       </span>
       <span class="text-2xs text-text-secondary">
-        {{ store.activeRunesCount }} Selected
+        {{ store.activeRunesCount }} {{ store.t('selectedRunesCount') }}
       </span>
     </div>
 
@@ -74,17 +74,17 @@ function changeStacks(rune, delta, event) {
             </span>
             <span class="text-2xs text-text-secondary">
               <template v-if="rune.haste_type === 'ULTIMATE_HASTE'">
-                <span class="text-accent-ult">Ultimate Haste</span>
-                • {{ rune.base_haste }} + {{ rune.haste_per_stack }}/stack
+                <span class="text-accent-ult">{{ store.t('ultHaste') }}</span>
+                • {{ rune.base_haste }} + {{ rune.haste_per_stack }}/{{ store.t('perStack') }}
               </template>
               <template v-else-if="rune.haste_type === 'SUMMONER_HASTE'">
-                <span class="text-accent-summoner">Summoner Haste</span>
+                <span class="text-accent-summoner">{{ store.t('summHaste') }}</span>
                 • +{{ rune.base_haste }} SH
               </template>
               <template v-else>
-                <span class="text-accent-ah">Ability Haste</span>
+                <span class="text-accent-ah">{{ store.t('generalHaste') }}</span>
                 <span v-if="rune.max_stacks > 0">
-                  • +{{ rune.haste_per_stack }}/stack (Max {{ rune.max_stacks }})
+                  • +{{ rune.haste_per_stack }}/{{ store.t('perStack') }} ({{ store.t('maxStacks') }} {{ rune.max_stacks }})
                 </span>
                 <span v-else>
                   • +{{ rune.base_haste }} AH

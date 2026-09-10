@@ -28,6 +28,10 @@ class CalculateRequestSchema(BaseModel):
         max_length=2,
         description="Array of summoner spell IDs up to 2 spells",
     )
+    locale: str = Field(
+        default="vi_VN",
+        description="Locale for calculation entities e.g. 'vi_VN' or 'en_US'",
+    )
 
 
 class AbilityCooldownResponseSchema(BaseModel):

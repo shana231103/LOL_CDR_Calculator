@@ -2,6 +2,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCalculatorStore } from '../stores/calculatorStore'
+import { normalizeText } from '../utils/text'
 import { Plus, X, Search } from 'lucide-vue-next'
 
 const store = useCalculatorStore()
@@ -14,8 +15,12 @@ const filteredItems = computed(() => {
   if (!searchQuery.value.trim()) {
     return items
   }
-  const q = searchQuery.value.toLowerCase()
-  return items.filter((i) => i.name.toLowerCase().includes(q))
+  const qNorm = normalizeText(searchQuery.value)
+  return items.filter((i) => {
+    const nameNorm = normalizeText(i.name)
+    const descNorm = normalizeText(i.description || '')
+    return nameNorm.includes(qNorm) || descNorm.includes(qNorm)
+  })
 })
 
 function openPicker(index) {
@@ -47,13 +52,13 @@ function closePicker() {
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-          Inventory
+          {{ store.t('itemTitle') }}
         </span>
-        <span class="text-2xs text-text-secondary">(Max 6 Items)</span>
+        <span class="text-2xs text-text-secondary">(Max 6)</span>
       </div>
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-inset border border-border-subtle">
-          <span class="text-2xs text-text-secondary">Item AH:</span>
+          <span class="text-2xs text-text-secondary">AH:</span>
           <span class="text-xs font-mono font-bold text-accent-ah tabular-nums">
             +{{ store.totalItemHaste }}
           </span>
@@ -62,7 +67,7 @@ function closePicker() {
           v-if="store.totalItemUltHaste > 0"
           class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-inset border border-border-subtle"
         >
-          <span class="text-2xs text-text-secondary">Ult Haste:</span>
+          <span class="text-2xs text-text-secondary">Ult:</span>
           <span class="text-xs font-mono font-bold text-accent-ult tabular-nums">
             +{{ store.totalItemUltHaste }}
           </span>
@@ -88,6 +93,7 @@ function closePicker() {
           <button
             @click="removeItem(idx, $event)"
             class="absolute top-1 right-1 w-5 h-5 rounded bg-black/80 text-text-secondary hover:text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            :title="store.t('remove')"
           >
             <X class="w-3.5 h-3.5" />
           </button>
@@ -123,7 +129,7 @@ function closePicker() {
         <template v-else>
           <div class="flex flex-col items-center gap-1 text-border-active group-hover:text-text-secondary">
             <Plus class="w-4 h-4" />
-            <span class="text-3xs uppercase font-mono tracking-wider">Slot {{ idx + 1 }}</span>
+            <span class="text-3xs uppercase font-mono tracking-wider">{{ store.t('emptySlot') }} {{ idx + 1 }}</span>
           </div>
         </template>
       </div>
@@ -139,7 +145,7 @@ function closePicker() {
       >
         <div class="flex items-center justify-between p-4 border-b border-border-default">
           <h2 class="text-base font-bold text-white tracking-wide">
-            Select Item for Slot {{ (activeSlot ?? 0) + 1 }}
+            {{ store.t('itemTitle') }} — {{ store.t('emptySlot') }} {{ (activeSlot ?? 0) + 1 }}
           </h2>
           <button
             @click="closePicker"
@@ -155,7 +161,7 @@ function closePicker() {
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Filter items by name..."
+              :placeholder="store.t('itemSearchPlaceholder')"
               class="w-full bg-[#111215] border border-border-default rounded-md pl-9 pr-3 py-2 text-sm text-white placeholder-text-secondary focus:outline-none focus:border-accent-ah"
               autofocus
             />
@@ -178,7 +184,7 @@ function closePicker() {
               />
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-semibold text-white truncate">{{ i.name }}</span>
-                <span class="text-2xs text-text-secondary truncate">{{ i.gold_total }} Gold</span>
+                <span class="text-2xs text-text-secondary truncate">{{ i.gold_total }} {{ store.t('goldCost') }}</span>
               </div>
             </div>
 
@@ -193,19 +199,19 @@ function closePicker() {
                 v-if="i.ultimate_haste > 0"
                 class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-surface-inset border border-border-default text-accent-ult"
               >
-                +{{ i.ultimate_haste }} Ult Haste
+                +{{ i.ultimate_haste }} Ult
               </span>
               <span
                 v-if="i.basic_haste > 0"
                 class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-surface-inset border border-border-default text-cyan-400"
               >
-                +{{ i.basic_haste }} Basic Haste
+                +{{ i.basic_haste }} QWE
               </span>
               <span
                 v-if="i.summoner_haste > 0"
                 class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-surface-inset border border-border-default text-accent-summoner"
               >
-                +{{ i.summoner_haste }} Summ Haste
+                +{{ i.summoner_haste }} Summ
               </span>
               <span
                 v-if="!i.ability_haste && !i.ultimate_haste && !i.basic_haste && !i.summoner_haste"
@@ -220,7 +226,7 @@ function closePicker() {
             v-if="filteredItems.length === 0"
             class="py-12 text-center text-text-secondary text-sm"
           >
-            No items found matching "{{ searchQuery }}"
+            {{ store.t('noItemsFound') }} "{{ searchQuery }}"
           </div>
         </div>
       </div>

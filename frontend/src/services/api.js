@@ -10,29 +10,32 @@ const apiClient = axios.create({
 })
 
 export const api = {
-  async getChampions() {
-    const res = await apiClient.get('/champions')
+  async getChampions(locale = 'vi_VN') {
+    const res = await apiClient.get('/champions', { params: { locale } })
     return res.data
   },
 
-  async getChampion(id) {
-    const res = await apiClient.get(`/champions/${id}`)
+  async getChampion(id, locale = 'vi_VN') {
+    const res = await apiClient.get(`/champions/${id}`, { params: { locale } })
     return res.data
   },
 
-  async getItems(search = '') {
-    const params = search ? { search } : {}
+  async getItems(search = '', locale = 'vi_VN') {
+    const params = { locale }
+    if (search) {
+      params.search = search
+    }
     const res = await apiClient.get('/items', { params })
     return res.data
   },
 
-  async getRunes() {
-    const res = await apiClient.get('/runes')
+  async getRunes(locale = 'vi_VN') {
+    const res = await apiClient.get('/runes', { params: { locale } })
     return res.data
   },
 
-  async getSpells() {
-    const res = await apiClient.get('/summoner-spells')
+  async getSpells(locale = 'vi_VN') {
+    const res = await apiClient.get('/summoner-spells', { params: { locale } })
     return res.data
   },
 
@@ -41,8 +44,12 @@ export const api = {
     return res.data
   },
 
-  async syncPatch(force = false) {
-    const res = await apiClient.post('/sync', null, { params: { force } })
+  async syncPatch(force = false, locales = 'vi_VN,en_US') {
+    const params = { force }
+    if (locales) {
+      params.locales = locales
+    }
+    const res = await apiClient.post('/sync', null, { params })
     return res.data
   },
 

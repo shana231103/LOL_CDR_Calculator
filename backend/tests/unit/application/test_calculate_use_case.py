@@ -23,13 +23,13 @@ class InMemoryChampionRepo(IChampionRepository):
     def __init__(self, champions: list[Champion]) -> None:
         self._champions = {c.id: c for c in champions}
 
-    async def get_all(self) -> list[Champion]:
+    async def get_all(self, locale: str = "vi_VN") -> list[Champion]:
         return list(self._champions.values())
 
-    async def get_by_id(self, champion_id: str) -> Champion | None:
+    async def get_by_id(self, champion_id: str, locale: str | None = None) -> Champion | None:
         return self._champions.get(champion_id)
 
-    async def upsert_many(self, champions: list[Champion]) -> None:
+    async def upsert_many(self, champions: list[Champion], locale: str = "vi_VN") -> None:
         for c in champions:
             self._champions[c.id] = c
 
@@ -38,13 +38,13 @@ class InMemoryItemRepo(IItemRepository):
     def __init__(self, items: list[Item]) -> None:
         self._items = {i.id: i for i in items}
 
-    async def get_all(self, search: str | None = None) -> list[Item]:
+    async def get_all(self, search: str | None = None, locale: str = "vi_VN") -> list[Item]:
         return list(self._items.values())
 
-    async def get_by_ids(self, item_ids: list[int]) -> list[Item]:
+    async def get_by_ids(self, item_ids: list[int], locale: str | None = None) -> list[Item]:
         return [self._items[i] for i in item_ids if i in self._items]
 
-    async def upsert_many(self, items: list[Item]) -> None:
+    async def upsert_many(self, items: list[Item], locale: str = "vi_VN") -> None:
         for i in items:
             self._items[i.id] = i
 
@@ -57,13 +57,13 @@ class InMemoryRuneRepo(IRuneRepository):
     def __init__(self, runes: list[Rune]) -> None:
         self._runes = {r.id: r for r in runes}
 
-    async def get_haste_runes(self) -> list[Rune]:
+    async def get_haste_runes(self, locale: str = "vi_VN") -> list[Rune]:
         return list(self._runes.values())
 
-    async def get_by_ids(self, rune_ids: list[int]) -> list[Rune]:
+    async def get_by_ids(self, rune_ids: list[int], locale: str | None = None) -> list[Rune]:
         return [self._runes[r] for r in rune_ids if r in self._runes]
 
-    async def upsert_many(self, runes: list[Rune]) -> None:
+    async def upsert_many(self, runes: list[Rune], locale: str = "vi_VN") -> None:
         for r in runes:
             self._runes[r.id] = r
 
@@ -72,13 +72,13 @@ class InMemorySpellRepo(ISpellRepository):
     def __init__(self, spells: list[SummonerSpell]) -> None:
         self._spells = {s.id: s for s in spells}
 
-    async def get_all(self) -> list[SummonerSpell]:
+    async def get_all(self, locale: str = "vi_VN") -> list[SummonerSpell]:
         return list(self._spells.values())
 
-    async def get_by_ids(self, spell_ids: list[str]) -> list[SummonerSpell]:
+    async def get_by_ids(self, spell_ids: list[str], locale: str | None = None) -> list[SummonerSpell]:
         return [self._spells[s] for s in spell_ids if s in self._spells]
 
-    async def upsert_many(self, spells: list[SummonerSpell]) -> None:
+    async def upsert_many(self, spells: list[SummonerSpell], locale: str = "vi_VN") -> None:
         for s in spells:
             self._spells[s.id] = s
 

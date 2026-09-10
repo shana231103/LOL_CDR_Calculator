@@ -16,6 +16,7 @@ class Rune:
     base_haste: float = 0.0
     haste_per_stack: float = 0.0
     max_stacks: int = 0
+    locale: str = "vi_VN"
 
     def compute_total_haste(self, stacks: int = 0) -> float:
         bounded_stacks = max(0, min(stacks, self.max_stacks))

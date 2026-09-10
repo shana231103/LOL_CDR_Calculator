@@ -31,8 +31,8 @@ class GetChampionsUseCase:
     def __init__(self, champion_repo: IChampionRepository) -> None:
         self._champion_repo = champion_repo
 
-    async def execute(self) -> list[ChampionDTO]:
-        champions = await self._champion_repo.get_all()
+    async def execute(self, locale: str = "vi_VN") -> list[ChampionDTO]:
+        champions = await self._champion_repo.get_all(locale=locale)
         return [_map_champion_to_dto(c) for c in champions]
 
 
@@ -40,8 +40,8 @@ class GetChampionByIdUseCase:
     def __init__(self, champion_repo: IChampionRepository) -> None:
         self._champion_repo = champion_repo
 
-    async def execute(self, champion_id: str) -> ChampionDTO | None:
-        champion = await self._champion_repo.get_by_id(champion_id)
+    async def execute(self, champion_id: str, locale: str | None = None) -> ChampionDTO | None:
+        champion = await self._champion_repo.get_by_id(champion_id, locale=locale)
         if champion is None:
             return None
         return _map_champion_to_dto(champion)

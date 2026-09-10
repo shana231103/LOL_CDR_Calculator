@@ -8,8 +8,8 @@ class GetRunesUseCase:
     def __init__(self, rune_repo: IRuneRepository) -> None:
         self._rune_repo = rune_repo
 
-    async def execute(self) -> list[RuneDTO]:
-        runes = await self._rune_repo.get_haste_runes()
+    async def execute(self, locale: str = "vi_VN") -> list[RuneDTO]:
+        runes = await self._rune_repo.get_haste_runes(locale=locale)
         return [
             RuneDTO(
                 id=rune.id,

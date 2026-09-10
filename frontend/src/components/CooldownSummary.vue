@@ -26,7 +26,7 @@ const orderedAbilities = computed(() => {
       <div class="bg-surface border border-border-default rounded-md p-3 flex flex-col gap-1">
         <div class="flex items-center gap-1.5 text-accent-ah">
           <Zap class="w-3.5 h-3.5" />
-          <span class="text-2xs uppercase tracking-wider font-semibold">Ability Haste</span>
+          <span class="text-2xs uppercase tracking-wider font-semibold">{{ store.t('generalHaste') }}</span>
         </div>
         <span class="tabular-nums text-xl font-bold font-mono text-white">
           {{ res ? res.ability_haste : 0 }}
@@ -37,7 +37,7 @@ const orderedAbilities = computed(() => {
       <div class="bg-surface border border-border-default rounded-md p-3 flex flex-col gap-1">
         <div class="flex items-center gap-1.5 text-accent-ult">
           <Flame class="w-3.5 h-3.5" />
-          <span class="text-2xs uppercase tracking-wider font-semibold">Ult Haste</span>
+          <span class="text-2xs uppercase tracking-wider font-semibold">{{ store.t('ultHaste') }}</span>
         </div>
         <span class="tabular-nums text-xl font-bold font-mono text-white">
           {{ res ? res.ultimate_haste : 0 }}
@@ -48,7 +48,7 @@ const orderedAbilities = computed(() => {
       <div class="bg-surface border border-border-default rounded-md p-3 flex flex-col gap-1">
         <div class="flex items-center gap-1.5 text-accent-summoner">
           <ShieldAlert class="w-3.5 h-3.5" />
-          <span class="text-2xs uppercase tracking-wider font-semibold">Summ. Haste</span>
+          <span class="text-2xs uppercase tracking-wider font-semibold">{{ store.t('summHaste') }}</span>
         </div>
         <span class="tabular-nums text-xl font-bold font-mono text-white">
           {{ res ? res.summoner_haste : 0 }}
@@ -60,16 +60,16 @@ const orderedAbilities = computed(() => {
     <div class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-3">
       <div class="flex items-center justify-between">
         <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-          Cooldown Telemetry
+          {{ store.t('telemetryTitle') }}
         </span>
         <span
           v-if="store.isCalculating"
           class="text-2xs font-mono text-accent-ah animate-pulse"
         >
-          Calculating...
+          {{ store.t('calculating') }}
         </span>
         <span v-else class="text-2xs font-mono text-text-secondary">
-          Live Authoritative
+          {{ store.t('liveAuthoritative') }}
         </span>
       </div>
 
@@ -88,7 +88,7 @@ const orderedAbilities = computed(() => {
               </span>
               <div class="flex flex-col">
                 <span class="text-xs font-semibold text-white">{{ ab.name }}</span>
-                <span class="text-3xs text-text-secondary font-mono">Rank {{ ab.rank }}/{{ ab.max_rank }}</span>
+                <span class="text-3xs text-text-secondary font-mono">{{ store.t('rank') }} {{ ab.rank }}/{{ ab.max_rank }}</span>
               </div>
             </div>
 
@@ -96,7 +96,7 @@ const orderedAbilities = computed(() => {
             <div class="flex items-baseline gap-2.5">
               <div class="flex flex-col items-end">
                 <span class="text-2xs text-text-secondary font-mono">
-                  Base: {{ ab.base_cooldown }}s
+                  {{ store.t('base') }}: {{ ab.base_cooldown }}s
                 </span>
                 <span
                   class="text-3xs font-mono"
@@ -130,7 +130,7 @@ const orderedAbilities = computed(() => {
       </div>
 
       <div v-else class="py-12 text-center text-text-secondary text-xs">
-        No active champion telemetry
+        {{ store.t('noActiveTelemetry') }}
       </div>
     </div>
 
@@ -140,7 +140,7 @@ const orderedAbilities = computed(() => {
       class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-2.5"
     >
       <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">
-        Summoner Spells Telemetry
+        {{ store.t('summonerSpellsTelemetry') }}
       </span>
 
       <div class="grid grid-cols-2 gap-2">

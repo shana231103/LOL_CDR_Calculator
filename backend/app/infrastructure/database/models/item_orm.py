@@ -9,6 +9,7 @@ class ItemORM(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    locale: Mapped[str] = mapped_column(String(10), primary_key=True, default="vi_VN")
     name: Mapped[str] = mapped_column(String(100), index=True)
     description: Mapped[str] = mapped_column(String(1000), default="")
     image_url: Mapped[str] = mapped_column(String(255), default="")

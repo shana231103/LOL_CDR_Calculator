@@ -8,8 +8,8 @@ class GetItemsUseCase:
     def __init__(self, item_repo: IItemRepository) -> None:
         self._item_repo = item_repo
 
-    async def execute(self, search: str | None = None) -> list[ItemDTO]:
-        items = await self._item_repo.get_all(search)
+    async def execute(self, search: str | None = None, locale: str = "vi_VN") -> list[ItemDTO]:
+        items = await self._item_repo.get_all(search=search, locale=locale)
         return [
             ItemDTO(
                 id=item.id,

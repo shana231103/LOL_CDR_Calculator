@@ -18,6 +18,7 @@ def _orm_to_domain(orm: RuneORM) -> Rune:
         base_haste=orm.base_haste,
         haste_per_stack=orm.haste_per_stack,
         max_stacks=orm.max_stacks,
+        locale=orm.locale,
     )
 
 
@@ -25,21 +26,24 @@ class SqlRuneRepository(IRuneRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def get_haste_runes(self) -> list[Rune]:
-        stmt = select(RuneORM).order_by(RuneORM.name)
+    async def get_haste_runes(self, locale: str = "vi_VN") -> list[Rune]:
+        stmt = select(RuneORM).where(RuneORM.locale == locale).order_by(RuneORM.name)
         res = await self._session.execute(stmt)
         return [_orm_to_domain(r) for r in res.scalars().all()]
 
-    async def get_by_ids(self, rune_ids: list[int]) -> list[Rune]:
+    async def get_by_ids(self, rune_ids: list[int], locale: str | None = None) -> list[Rune]:
         if not rune_ids:
             return []
         stmt = select(RuneORM).where(RuneORM.id.in_(rune_ids))
+        if locale:
+            stmt = stmt.where(RuneORM.locale == locale)
         res = await self._session.execute(stmt)
         return [_orm_to_domain(r) for r in res.scalars().all()]
 
-    async def upsert_many(self, runes: list[Rune]) -> None:
+    async def upsert_many(self, runes: list[Rune], locale: str = "vi_VN") -> None:
         for r in runes:
-            existing = await self._session.get(RuneORM, r.id)
+            loc = getattr(r, "locale", locale) or locale
+            existing = await self._session.get(RuneORM, (r.id, loc))
             if existing:
                 existing.key = r.key
                 existing.name = r.name
@@ -52,6 +56,7 @@ class SqlRuneRepository(IRuneRepository):
                 self._session.add(
                     RuneORM(
                         id=r.id,
+                        locale=loc,
                         key=r.key,
                         name=r.name,
                         icon_url=r.icon_url,

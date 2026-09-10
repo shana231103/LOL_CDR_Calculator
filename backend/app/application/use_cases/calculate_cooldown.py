@@ -34,16 +34,36 @@ class CalculateCooldownUseCase:
         self._spell_repo = spell_repo
 
     async def execute(self, command: CalculateCooldownCommand) -> CalculationResultDTO:
-        champion = await self._champion_repo.get_by_id(command.champion_id)
+        loc = getattr(command, "locale", "vi_VN") or "vi_VN"
+        try:
+            champion = await self._champion_repo.get_by_id(command.champion_id, locale=loc)
+        except TypeError:
+            champion = await self._champion_repo.get_by_id(command.champion_id)
+
+        if champion is None:
+            champion = await self._champion_repo.get_by_id(command.champion_id)
         if champion is None:
             raise EntityNotFoundError(f"Champion '{command.champion_id}' not found.")
 
         # Load items
-        items = await self._item_repo.get_by_ids(command.items) if command.items else []
+        if command.items:
+            try:
+                items = await self._item_repo.get_by_ids(command.items, locale=loc)
+            except TypeError:
+                items = await self._item_repo.get_by_ids(command.items)
+        else:
+            items = []
 
         # Load runes and construct RuneSelections
         rune_ids = [r.rune_id for r in command.runes]
-        loaded_runes = await self._rune_repo.get_by_ids(rune_ids) if rune_ids else []
+        if rune_ids:
+            try:
+                loaded_runes = await self._rune_repo.get_by_ids(rune_ids, locale=loc)
+            except TypeError:
+                loaded_runes = await self._rune_repo.get_by_ids(rune_ids)
+        else:
+            loaded_runes = []
+
         runes_map = {r.id: r for r in loaded_runes}
         rune_selections: list[RuneSelection] = []
         for r_input in command.runes:
@@ -53,11 +73,13 @@ class CalculateCooldownUseCase:
                 )
 
         # Load summoner spells
-        spells = (
-            await self._spell_repo.get_by_ids(command.summoner_spells)
-            if command.summoner_spells
-            else []
-        )
+        if command.summoner_spells:
+            try:
+                spells = await self._spell_repo.get_by_ids(command.summoner_spells, locale=loc)
+            except TypeError:
+                spells = await self._spell_repo.get_by_ids(command.summoner_spells)
+        else:
+            spells = []
 
         # Build skill ranks
         skill_ranks: dict[SkillSlot, SkillRank] = {}

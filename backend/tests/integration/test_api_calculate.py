@@ -133,3 +133,20 @@ async def test_api_calculate_invalid_rank(setup_test_app):
         resp = await client.post("/api/v1/calculate", json=payload)
         assert resp.status_code == 400
         assert resp.json()["error"] == "INVALID_RANK"
+
+
+@pytest.mark.anyio
+async def test_api_calculate_with_locale(setup_test_app):
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        payload = {
+            "champion_id": "Ahri",
+            "abilities": {"Q": 1},
+            "items": [3001],
+            "locale": "vi_VN",
+        }
+        resp = await client.post("/api/v1/calculate", json=payload)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["champion_id"] == "Ahri"
+        assert data["ability_haste"] == 20.0

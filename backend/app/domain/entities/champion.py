@@ -13,6 +13,7 @@ class Champion:
     name: str
     title: str
     image_url: str
+    locale: str = "vi_VN"
     abilities: dict[SkillSlot, Ability] = field(default_factory=dict)
 
     def get_ability(self, slot: SkillSlot) -> Ability:

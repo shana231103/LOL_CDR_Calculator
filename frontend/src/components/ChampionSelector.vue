@@ -2,6 +2,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useCalculatorStore } from '../stores/calculatorStore'
+import { normalizeText } from '../utils/text'
 import { Search, UserCheck, X } from 'lucide-vue-next'
 
 const store = useCalculatorStore()
@@ -12,10 +13,13 @@ const filteredChampions = computed(() => {
   if (!searchQuery.value.trim()) {
     return store.champions
   }
-  const q = searchQuery.value.toLowerCase()
-  return store.champions.filter(
-    (c) => c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q)
-  )
+  const qNorm = normalizeText(searchQuery.value)
+  return store.champions.filter((c) => {
+    const nameNorm = normalizeText(c.name)
+    const idNorm = normalizeText(c.id)
+    const titleNorm = normalizeText(c.title || '')
+    return nameNorm.includes(qNorm) || idNorm.includes(qNorm) || titleNorm.includes(qNorm)
+  })
 })
 
 function selectChampion(champ) {
@@ -28,13 +32,13 @@ function selectChampion(champ) {
 <template>
   <div class="bg-surface border border-border-default rounded-md p-4 flex flex-col gap-3">
     <div class="flex items-center justify-between">
-      <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">Champion</span>
+      <span class="text-xs uppercase tracking-wider text-text-secondary font-semibold">{{ store.t('championTitle') }}</span>
       <button
         @click="isOpen = true"
         class="text-xs text-accent-ah hover:text-white transition-colors flex items-center gap-1 font-medium"
       >
         <UserCheck class="w-3.5 h-3.5" />
-        {{ store.selectedChampion ? 'Switch Champion' : 'Select Champion' }}
+        {{ store.selectedChampion ? (store.currentLocale === 'vi_VN' ? 'Đổi tướng' : 'Switch Champion') : store.t('selectChampionPrompt') }}
       </button>
     </div>
 
@@ -64,7 +68,7 @@ function selectChampion(champ) {
       @click="isOpen = true"
       class="h-16 border-2 border-dashed border-border-default hover:border-border-active rounded-md flex items-center justify-center cursor-pointer text-text-secondary hover:text-white transition-colors"
     >
-      <span class="text-sm font-medium">+ Choose Champion</span>
+      <span class="text-sm font-medium">+ {{ store.t('selectChampionPrompt') }}</span>
     </div>
 
     <!-- Modal Popover -->
@@ -77,7 +81,7 @@ function selectChampion(champ) {
       >
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-4 border-b border-border-default">
-          <h2 class="text-base font-bold text-white tracking-wide">Select Champion</h2>
+          <h2 class="text-base font-bold text-white tracking-wide">{{ store.t('championTitle') }}</h2>
           <button
             @click="isOpen = false"
             class="p-1 rounded text-text-secondary hover:text-white hover:bg-surface-hover transition-colors"
@@ -93,7 +97,7 @@ function selectChampion(champ) {
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search champion by name..."
+              :placeholder="store.t('championSearchPlaceholder')"
               class="w-full bg-[#111215] border border-border-default rounded-md pl-9 pr-3 py-2 text-sm text-white placeholder-text-secondary focus:outline-none focus:border-accent-ah"
               autofocus
             />
@@ -122,7 +126,7 @@ function selectChampion(champ) {
             v-if="filteredChampions.length === 0"
             class="col-span-full py-12 text-center text-text-secondary text-sm"
           >
-            No champions found matching "{{ searchQuery }}"
+            {{ store.t('noChampionsFound') }} "{{ searchQuery }}"
           </div>
         </div>
       </div>
